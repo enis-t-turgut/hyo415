@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenci Sunum Zaman Çizelgesi</title>
+    <link rel="stylesheet" href="https://cdn.knightlab.com/libs/timeline3/latest/css/timeline.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #timeline {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 800px;
+        }
+        .today-marker .tl-time-event-content {
+            color: red !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>Öğrenci Sunum Zaman Çizelgesi</h1>
+    <div id="timeline"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/tr.js"></script>
+    <script src="https://cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
+    <script>
+        moment.locale('tr'); // Tarihleri Türkçeye çevirmek için dil ayarı
+
+        const students = ["stu1", "stu2", "stu3", "stu4", "stu5", "stu6", "stu7", "stu8", "stu9", "stu10", "stu11", "stu12", "stu13", "stu14", "stu15", "stu16", "stu17", "stu18", "stu19", "stu20", "stu21", "stu22", "stu23", "stu24", "stu25", "stu26", "stu27", "stu28"];
+        const lessonDates = [
+            { date: "2024-09-25", name: "Ders 1" },
+            { date: "2024-10-02", name: "Ders 2" },
+            { date: "2024-10-09", name: "Ders 3" },
+            { date: "2024-10-16", name: "Ders 4" },
+            { date: "2024-10-23", name: "Ders 5" },
+            { date: "2024-10-30", name: "Ders 6" },
+            { date: "2024-11-06", name: "Ders 7" },
+            { date: "2024-11-13", name: "Ders 8" },
+            { date: "2024-11-20", name: "Ders 9" },
+            { date: "2024-11-27", name: "Ders 10" },
+            { date: "2024-12-04", name: "Ders 11" },
+            { date: "2024-12-11", name: "Ders 12" },
+            { date: "2024-12-18", name: "Ders 13" },
+            { date: "2024-12-25", name: "Ders 14" }
+        ];
+
+        const presentations = [];
+
+        // Sunum tarihlerini rastgele atama, maksimum 4 öğrenci her tarih için
+        students.forEach(student => {
+            let assigned = false;
+            while (!assigned) {
+                const randomIndex = Math.floor(Math.random() * lessonDates.length);
+                const date = lessonDates[randomIndex];
+                const countOnDate = presentations.filter(p => p.date === date.date).length;
+                if (countOnDate < 4) {
+                    presentations.push({ student, date: date.date });
+                    assigned = true;
+                }
+            }
+        });
+
+        // Zaman çizelgesi olayları hazırlama
+        const events = presentations.map(presentation => {
+            const lesson = lessonDates.find(lesson => lesson.date === presentation.date);
+            return {
+                start_date: {
+                    year: moment(presentation.date).year(),
+                    month: moment(presentation.date).month() + 1,
+                    day: moment(presentation.date).date()
+                },
+                text: {
+                    headline: `${presentation.student} Sunumu - ${lesson.name}`,
+                    text: `${presentation.student} tarafından ${lesson.name} (${moment(presentation.date).format('LL')}) tarihinde yapılacak sunum`
+                }
+            };
+        });
+
+        // Tüm ders günlerini olaylar listesine ekle
+        events.push(...lessonDates.map(lesson => {
+            return {
+                start_date: {
+                    year: moment(lesson.date).year(),
+                    month: moment(lesson.date).month() + 1,
+                    day: moment(lesson.date).date()
+                },
+                text: {
+                    headline: lesson.name,
+                    text: `${lesson.name} (${moment(lesson.date).format('LL')})`
+                },
+                background: { color: "#0000FF" },
+                group: "lesson"
+            };
+        }));
+
+        // Bugünün işaretçisini ekle
+        const today = moment();
+        events.push({
+            start_date: {
+                year: today.year(),
+                month: today.month() + 1,
+                day: today.date()
+            },
+            text: {
+                headline: "Bugün",
+                text: "Bugünün Tarihi"
+            },
+            background: {
+                color: "#FF0000"
+            },
+            group: "today",
+            unique_id: "today",
+            css_class: "today-marker"
+        });
+
+        const timelineData = {
+            title: {
+                text: {
+                    headline: "Öğrenci Sunum Zaman Çizelgesi",
+                    text: "23 Eylül 2024'ten 31 Aralık 2024'e kadar öğrenci sunumlarının zaman çizelgesi"
+                }
+            },
+            events: events
+        };
+
+        window.timeline = new TL.Timeline('timeline', timelineData, {
+            timenav_position: 'top',
+            timenav_height_percentage: 40,
+            default_bg_color: { r: 255, g: 255, b: 255 }
+        });
+    </script>
+</body>
+</html>
