@@ -13,11 +13,24 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            height: 800px;
+            height: 600px; /* Yüksekliği düşürdüm */
         }
-        .today-marker .tl-time-event-content {
-            color: red !important;
+        .today-marker {
+            color: red;
         }
+        .tl-headline {
+            text-transform: none !important; /* Başlıkları cümle şeklinde göster */
+        }
+
+#timeline .tl-timemarker-content .tl-headline {
+    color: #556B2F !important; /* Sadece event kutucuklarının başlıklarının rengini mavi yap */
+}
+
+#timeline .tl-timemarker-content .tl-headline:hover {
+    color: white !important; /* Hover durumunda başlığın rengi beyaz */
+}
+
+
     </style>
 </head>
 <body>
@@ -30,80 +43,114 @@
     <script>
         moment.locale('tr'); // Tarihleri Türkçeye çevirmek için dil ayarı
 
-        const students = ["stu1", "stu2", "stu3", "stu4", "stu5", "stu6", "stu7", "stu8", "stu9", "stu10", "stu11", "stu12", "stu13", "stu14", "stu15", "stu16", "stu17", "stu18", "stu19", "stu20", "stu21", "stu22", "stu23", "stu24", "stu25", "stu26", "stu27", "stu28"];
         const lessonDates = [
-            { date: "2024-09-25", name: "Ders 1" },
-            { date: "2024-10-02", name: "Ders 2" },
-            { date: "2024-10-09", name: "Ders 3" },
-            { date: "2024-10-16", name: "Ders 4" },
-            { date: "2024-10-23", name: "Ders 5" },
-            { date: "2024-10-30", name: "Ders 6" },
-            { date: "2024-11-06", name: "Ders 7" },
-            { date: "2024-11-13", name: "Ders 8" },
-            { date: "2024-11-20", name: "Ders 9" },
-            { date: "2024-11-27", name: "Ders 10" },
-            { date: "2024-12-04", name: "Ders 11" },
-            { date: "2024-12-11", name: "Ders 12" },
-            { date: "2024-12-18", name: "Ders 13" },
-            { date: "2024-12-25", name: "Ders 14" }
+            { date: "2024-25-09", name: "Ders 1", presentations: []},
+            { date: "2024-02-10", name: "Ders 2", presentations: []},
+            { date: "2024-09-10", name: "Ders 3", presentations: [
+                { student: "#", topic: "#" },
+                
+            ] },
+            { date: "2024-16-10", name: "Ders 4", presentations: [
+                { student: "#", topic: "#" },
+                
+            ] },
+            { date: "2024-23-10", name: "Ders 5", presentations: [
+                { student: "#", topic: "#" },
+                
+            ] },
+            { date: "2024-30-10", name: "Ders 6", presentations: [
+                { student: "#", topic: "#" },
+                
+            ] },
+            { date: "2024-06-11", name: "Ders 7", presentations: [
+                { student: "#", topic: "#" },
+                
+            ] },
+            { date: "2024-13-11", name: "Ders 8", presentations: [
+                { student: "Mehmet N.", topic: "Malzeme Teknolojisi (kompozitler)" },
+                
+            ] },
+            { date: "2024-20-11", name: "Ders 9", presentations: [
+                { student: "Hüseyin A.", topic: "Malzeme Teknolojisi (kompozitler)" },
+                
+            ] },
+            { date: "2024-27-11", name: "Ders 10", presentations: [
+                { student: "#", topic: "#" },
+                
+            ] },
+            { date: "2024-04-12", name: "Ders 11", presentations: [
+                { student: "#", topic: "#" },
+                
+            ] },
+            { date: "2024-11-12", name: "Ders 12", presentations: [
+                { student: "#", topic: "#" },
+                
+            ] },
+            { date: "2024-18-12", name: "Ders 13", presentations: [
+                { student: "#", topic: "#" },
+                
+            ] },
+            { date: "2024-25-12", name: "Ders 14", presentations: [
+                { student: "Deniz T.", topic: "SAF’ın Havacılığın İklim Üzerindeki Etkileri (Impact of SAF on Aviation's Climate Effects)" },
+                { student: "#", topic: "#" },
+            ] }
         ];
 
-        const presentations = [];
-
-        // Sunum tarihlerini rastgele atama, maksimum 4 öğrenci her tarih için
-        students.forEach(student => {
-            let assigned = false;
-            while (!assigned) {
-                const randomIndex = Math.floor(Math.random() * lessonDates.length);
-                const date = lessonDates[randomIndex];
-                const countOnDate = presentations.filter(p => p.date === date.date).length;
-                if (countOnDate < 4) {
-                    presentations.push({ student, date: date.date });
-                    assigned = true;
-                }
-            }
-        });
-
         // Zaman çizelgesi olayları hazırlama
-        const events = presentations.map(presentation => {
-            const lesson = lessonDates.find(lesson => lesson.date === presentation.date);
-            return {
+        const events = lessonDates.flatMap(lesson => {
+            const lessonEvent = {
                 start_date: {
-                    year: moment(presentation.date).year(),
-                    month: moment(presentation.date).month() + 1,
-                    day: moment(presentation.date).date()
-                },
-                text: {
-                    headline: `${presentation.student} Sunumu - ${lesson.name}`,
-                    text: `${presentation.student} tarafından ${lesson.name} (${moment(presentation.date).format('LL')}) tarihinde yapılacak sunum`
-                }
-            };
-        });
-
-        // Tüm ders günlerini olaylar listesine ekle
-        events.push(...lessonDates.map(lesson => {
-            return {
-                start_date: {
-                    year: moment(lesson.date).year(),
-                    month: moment(lesson.date).month() + 1,
-                    day: moment(lesson.date).date()
+                    year: moment(lesson.date, 'YYYY-DD-MM').year(), month: moment(lesson.date, 'YYYY-DD-MM').month() + 1, day: moment(lesson.date, 'YYYY-DD-MM').date()
                 },
                 text: {
                     headline: lesson.name,
-                    text: `${lesson.name} (${moment(lesson.date).format('LL')})`
+                    text: `${lesson.name} (${moment(lesson.date, 'YYYY-DD-MM').format('DD-MM-YYYY')})`
                 },
-                background: { color: "#0000FF" },
+                background: {
+                    color: lesson.date === "2024-11-11" ? "#FFD700" : "#D3D3D3" // 11 Kasım için özel renk ekliyoruz
+                },
                 group: "lesson"
             };
-        }));
+
+            const presentationEvents = lesson.presentations.map(presentation => {
+                return {
+                    start_date: {
+                        year: moment(lesson.date, 'YYYY-DD-MM').year(),
+                        month: moment(lesson.date, 'YYYY-DD-MM').month() + 1,
+                        day: moment(lesson.date, 'YYYY-DD-MM').date()
+                    },
+                    text: {
+                        headline: `${presentation.student} - ${presentation.topic}`,
+                        text: `${presentation.student} tarafından "${presentation.topic}" konusunda ${moment(lesson.date, 'YYYY-DD-MM').format('DD-MM-YYYY')} (${lesson.name})  tarihinde yapılacak sunum`
+                    }
+                };
+            });
+
+            return [lessonEvent, ...presentationEvents];
+        });
+
+        // 11 Kasım Sınav notunu ekle
+        events.push({
+            start_date: {
+                year: 2024,
+                month: 11,
+                day: 11
+            },
+            text: {
+                headline: "Ara sınav/ Midterm",
+                text: "11 Kasım 2024 tarihinde yapılacak sınav."
+            },
+            background: {
+                color: "#FFD700" // Altın rengi
+            },
+            group: "exam"
+        });
 
         // Bugünün işaretçisini ekle
         const today = moment();
         events.push({
             start_date: {
-                year: today.year(),
-                month: today.month() + 1,
-                day: today.date()
+                year: today.year(), month: today.month() + 1, day: today.date()
             },
             text: {
                 headline: "Bugün",
@@ -113,15 +160,14 @@
                 color: "#FF0000"
             },
             group: "today",
-            unique_id: "today",
-            css_class: "today-marker"
+            unique_id: "today"
         });
 
         const timelineData = {
             title: {
                 text: {
-                    headline: "Öğrenci Sunum Zaman Çizelgesi",
-                    text: "23 Eylül 2024'ten 31 Aralık 2024'e kadar öğrenci sunumlarının zaman çizelgesi"
+                    headline: "HYO415 Öğrenci Sunum Zaman Çizelgesi",
+                    text: ""
                 }
             },
             events: events
@@ -132,6 +178,8 @@
             timenav_height_percentage: 40,
             default_bg_color: { r: 255, g: 255, b: 255 }
         });
+		
+		
     </script>
 </body>
 </html>
